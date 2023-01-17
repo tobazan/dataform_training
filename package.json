@@ -1,0 +1,6 @@
+{
+  "name": "dataform_training_mati",
+  "dependencies": {
+    "@dataform/core": "2.0.1"
+  }
+}
