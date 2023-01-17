@@ -5,12 +5,44 @@
 
 -- Config blocks allow you to configure, document, and test your data assets.
 config {
-  type: "view", // Creates a view in BigQuery. Try changing to "table" instead.
-  columns: {
-    test: "A description for the test column", // Column descriptions are pushed to BigQuery.
-  }
+  type: "table", // Creates a view in BigQuery. Try changing to "table" instead.
 }
 
 -- The rest of a SQLX file contains your SELECT statement used to create the table.
 
-SELECT 1 as test
+--SELECT fullVisitorId as user,
+--      COUNT(*) as amount_of_sessions,
+--      geoNetwork.city as city,
+--     userId as userId,
+--      userId as userId,
+--      userId as userId
+--FROM ${constants.test_table}
+--WHERE date BETWEEN ${constants.startDate} AND ${constants.endDate} 
+
+SELECT 
+  A.fullVisitorId,
+  A.number_sessions,
+  A.first_city,
+  B.transactions
+FROM (
+    SELECT
+      fullVisitorId,
+      COUNT(DISTINCT fullVisitorId|| '-'  ||visitStartTime) as number_sessions,
+      ARRAY_AGG(geoNetwork.city ORDER BY visitStartTime)[OFFSET(0)] as first_city,
+    FROM
+      ${constants.test_table}
+    WHERE
+      _table_suffix BETWEEN ${constants.startDate} AND ${constants.endDate}
+      GROUP BY 1
+  ) A
+  LEFT JOIN (
+    SELECT 
+      fullVisitorId,
+      IF(COUNT(DISTINCT hits.transaction.transactionId)>=1, 1, 0) AS transactions
+      FROM ${constants.test_table},
+      UNNEST(hits) as hits
+    WHERE
+      _table_suffix BETWEEN ${constants.startDate} AND ${constants.endDate}
+      GROUP BY 1
+  ) B
+  ON A.fullvisitorId = B.fullVisitorID
