@@ -32,7 +32,7 @@ FROM (
     FROM
       ${constants.test_table}
     WHERE
-      _table_suffix BETWEEN ${constants.startDate} AND ${constants.endDate}
+      _table_suffix BETWEEN "${constants.startDate}" AND "${constants.endDate}"
       GROUP BY 1
   ) A
   LEFT JOIN (
@@ -42,7 +42,7 @@ FROM (
       FROM ${constants.test_table},
       UNNEST(hits) as hits
     WHERE
-      _table_suffix BETWEEN ${constants.startDate} AND ${constants.endDate}
+      _table_suffix BETWEEN "${constants.startDate}" AND "${constants.endDate}"
       GROUP BY 1
   ) B
   ON A.fullvisitorId = B.fullVisitorID
